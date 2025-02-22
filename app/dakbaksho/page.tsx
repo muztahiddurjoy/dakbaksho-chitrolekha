@@ -1,8 +1,11 @@
+import ChithiCompose from '@/components/chithi-compose'
 import React from 'react'
 
 const DakbakshoPage = () => {
   return (
-    <div>DakbakshoPage</div>
+    <div>
+        <ChithiCompose/>
+    </div>
   )
 }
 
