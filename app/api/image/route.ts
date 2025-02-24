@@ -16,7 +16,7 @@ export const GET = async () => {
   let line = "";
 
   words.forEach((word) => {
-    if ((line + word).length <= 20) {
+    if ((line + word).length <= 40) {
       line += `${word} `;
     } else {
       formattedText += `<tspan x="50%" dy="1.2em">${line.trim()}</tspan>`;
@@ -32,7 +32,16 @@ export const GET = async () => {
           `<svg width="1600" height="800">
                 <style>
                     @font-face {
-                        font-family: 'CustomFont';
+                        font-family: 'Priyo';
+                        src: url('${path.join(
+                          process.cwd(),
+                          "public",
+                          "fonts",
+                          "Priyo.ttf"
+                        )}') format('truetype');
+                    }
+                    @font-face {
+                        font-family: 'Baloo';
                         src: url('${path.join(
                           process.cwd(),
                           "public",
@@ -40,13 +49,19 @@ export const GET = async () => {
                           "Balooda.ttf"
                         )}') format('truetype');
                     }
-                    text {
-                        font-family: 'CustomFont';
+                    #title {
+                        font-family: 'Priyo';
                         font-weight: bold;
                     }
+                    text{
+                    font-family: 'Balooda';
+                    }
                 </style>
-                <text x="50%" y="50%" font-size="80" fill="#A72120" text-anchor="middle" dominant-baseline="middle">
+                <text x="50%" id="title" y="10%" font-size="80" fill="#A72120" text-anchor="middle" dominant-baseline="middle">
                     ${formattedText}
+                </text>
+                <text x="50%" y="70%" font-size="60" fill="#000000" text-anchor="middle" dominant-baseline="middle">
+                    Muztahidul Islam
                 </text>
             </svg>`
         ),
