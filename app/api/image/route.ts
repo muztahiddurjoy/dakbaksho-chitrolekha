@@ -5,7 +5,7 @@ import fs from "fs";
 
 export const GET = async () => {
   const imagePath = path.join(process.cwd(), "public", "bg.jpeg");
-  const outputImagePath = path.join(process.cwd(), "public", "output.jpg");
+  const outputImagePath = path.join("/tmp", "output.jpg");
   const text =
     "যেহেতু মানব অধিকারের প্রতি অবজ্ঞা এবং ঘৃণার ফলে মানুবের বিবেক লাঞ্ছিত বোধ করে এমন সব বর্বরোচিত ";
 
@@ -70,8 +70,10 @@ export const GET = async () => {
     ])
     .toFile(outputImagePath);
 
-  return new NextResponse(
-    JSON.stringify({ url: process.env.NEXT_PUBLIC_URL + "/public/output.jpg" }),
-    { status: 200, headers: { "Content-Type": "application/json" } }
-  );
+    const imageBufferOutput = fs.readFileSync(outputImagePath);
+    return new NextResponse(imageBufferOutput, {
+        status: 200,
+        headers: { "Content-Type": "image/jpeg" },
+    });
+  
 };
