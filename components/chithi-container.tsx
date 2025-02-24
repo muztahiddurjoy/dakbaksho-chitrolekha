@@ -14,6 +14,7 @@ import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { Download } from 'lucide-react'
 import * as htmlToImage from 'html-to-image';
+import Image from 'next/image'
 
 const Chithicontainer = () => {
     const [title, settitle] = useState<string>('')
@@ -136,7 +137,8 @@ useEffect(() => {
     return (
         <>
         <Card className='min-w-[300px] md:w-[60%] w-[90%]'>
-            <CardHeader>
+            <CardHeader className='flex flex-row justify-center'>
+                <Image src='/logo.png' width={200} height={200} alt="Dakbaksho" />
                 {/* <CardTitle>Card Title</CardTitle>
                 <CardDescription>Card Description</CardDescription> */}
             </CardHeader>
