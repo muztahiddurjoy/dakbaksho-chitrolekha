@@ -56,14 +56,44 @@ const Chithicontainer = () => {
   }, [title, userName, chithi]);
 
   // Split the chithi text into pages with a fixed number of words per page
+  // const splitText = (text: string, wordsPerPage: number) => {
+  //   const words = text.split(/\s+/).filter((word) => word.length > 0);
+  //   const pages = [];
+  //   for (let i = 0; i < words.length; i += wordsPerPage) {
+  //     pages.push(words.slice(i, i + wordsPerPage).join(" "));
+  //   }
+  //   return pages;
+  // };
+
   const splitText = (text: string, wordsPerPage: number) => {
-    const words = text.split(/\s+/).filter((word) => word.length > 0);
-    const pages = [];
-    for (let i = 0; i < words.length; i += wordsPerPage) {
-      pages.push(words.slice(i, i + wordsPerPage).join(" "));
+    // Split text into tokens of words and whitespace (including newlines)
+    const tokens = text.match(/(\s+|\S+)/g) || [];
+    const pages: string[] = [];
+    let currentPage: string[] = [];
+    let currentWordCount = 0;
+
+    for (const token of tokens) {
+        if (/\S/.test(token)) { // Check if the token is a word (non-whitespace)
+            currentWordCount++;
+            currentPage.push(token);
+            // When reaching the word limit, add the current page and reset
+            if (currentWordCount === wordsPerPage) {
+                pages.push(currentPage.join(''));
+                currentPage = [];
+                currentWordCount = 0;
+            }
+        } else { // Whitespace token, add to current page
+            currentPage.push(token);
+        }
     }
+
+    // Add any remaining content as the last page
+    if (currentPage.length > 0) {
+        pages.push(currentPage.join(''));
+    }
+
     return pages;
-  };
+};
 
   // Create a page element (either cover or content page)
   const createPageElement = (content: string, isCover: boolean = false) => {
@@ -157,7 +187,7 @@ const Chithicontainer = () => {
     await downloadImage(coverPage, "chithi-cover.png");
 
     // Split the chithi text into pages and download each page
-    const pages = splitText(chithi, 100);
+    const pages = splitText(chithi, 80);
     const promises = Array.from({ length: pages.length }, (_, i) =>
       downloadImage(createPageElement(pages[i]), `chithi-page-${i + 1}.png`)
     );
