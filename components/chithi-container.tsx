@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import Image from "next/image";
 
@@ -20,10 +20,17 @@ const Chithicontainer = () => {
   const [title, settitle] = useState<string>("");
   const [userName, setuserName] = useState<string>("");
   const [chithi, setchithi] = useState<string>("");
+  const [isLoading, setisLoading] = useState<boolean>(false)
 
   // Load saved data from localStorage on component mount
   useEffect(() => {
     if (window) {
+      const link = document.createElement("link");
+      link.href = "https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400..800&display=swap";
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap"
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
       const savedChithi = window.localStorage.getItem("chithi");
       try {
         const chithiObj = JSON.parse(savedChithi || "{}");
@@ -61,17 +68,17 @@ const Chithicontainer = () => {
   // Create a page element (either cover or content page)
   const createPageElement = (content: string, isCover: boolean = false) => {
     const page = document.createElement("div");
-    page.style.width = "1600px"; // Square width in pixels
-    page.style.height = "1600px"; // Square height in pixels
-    page.style.padding = "40px";
+    page.style.width = "800px"; // Square width in pixels
+    page.style.height = "800px"; // Square height in pixels
+    page.style.padding = "20px";
     page.style.backgroundColor = "transparent"; // Deep red for cover, transparent for content
-    page.style.backgroundImage = `url(${window.location.origin}/bg.jpeg)`; // Use bg.jpeg as background for content pages
+    page.style.backgroundImage = isCover?`url(${window.location.origin}/bg.jpeg)`:`url(${window.location.origin}/page.png)`; // Use bg.jpeg as background for content pages
     page.style.backgroundSize = "cover"; // Ensure the background image covers the entire element
     page.style.backgroundPosition = "center"; // Center the background image
     page.style.position = "fixed";
     page.style.left = "-10000px"; // Move off-screen
     page.style.top = "0";
-    page.style.fontFamily = "system-ui, -apple-system, sans-serif";
+    page.style.fontFamily = isCover? "Baloo Da 2":"Noto Sans Bengali"; // Use Baloo Da 2 for cover, Noto Sans Bengali for content
     page.style.visibility = "hidden"; // Hide the element initially
     page.style.color = "#A72120" // White text for cover, black for content
     page.style.display = "flex";
@@ -82,12 +89,12 @@ const Chithicontainer = () => {
 
     if (isCover) {
       page.innerHTML = `
-        <h1 style="font-size: 72px; margin-bottom: 30px;">${title}</h1>
-        <h2 style="font-size: 48px;">${userName}</h2>
+        <h1 style="font-size: 62px; margin-bottom: 30px;">${title}</h1>
+        <h2 style="font-size: 38px;">${userName}</h2>
       `;
     } else {
       page.innerHTML = `
-        <div style="font-size: 45px; line-height: 1.6; white-space: pre-wrap; padding: 20px;font-weight:700">
+        <div style="font-size: 25px; line-height: 1.6; white-space: pre-wrap; padding: 20px;font-weight:500">
           ${content}
         </div>
       `;
@@ -99,6 +106,7 @@ const Chithicontainer = () => {
 
   // Download an image of the given element using html2canvas
   const downloadImage = async (element: HTMLElement, name: string) => {
+    console.log(chithi)
     try {
       // Ensure fonts are loaded
       await document.fonts.ready;
@@ -144,15 +152,18 @@ const Chithicontainer = () => {
   // Handle the download process
   const handleDownload = async () => {
     // Download the cover page
+    setisLoading(true)
     const coverPage = createPageElement("", true);
     await downloadImage(coverPage, "chithi-cover.png");
 
     // Split the chithi text into pages and download each page
     const pages = splitText(chithi, 100);
-    for (let i = 0; i < pages.length; i++) {
-      const contentPage = createPageElement(pages[i]);
-      await downloadImage(contentPage, `chithi-page-${i + 1}.png`);
-    }
+    const promises = Array.from({ length: pages.length }, (_, i) =>
+      downloadImage(createPageElement(pages[i]), `chithi-page-${i + 1}.png`)
+    );
+    const result = await Promise.all(promises);
+    console.log(result);
+    setisLoading(false)
   };
 
   return (
@@ -195,9 +206,9 @@ const Chithicontainer = () => {
         <CardFooter className="flex justify-end">
           <Button
             onClick={handleDownload}
-            disabled={!title || !userName || !chithi}
+            disabled={!title || !userName || !chithi || isLoading}
           >
-            <Download /> ডাউনলোড করুন
+            {isLoading?<Loader2 className="animate-spin"/>:<Download />} ডাউনলোড করুন
           </Button>
         </CardFooter>
       </Card>

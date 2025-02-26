@@ -4,8 +4,6 @@
 
 
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -72,4 +70,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+}
+
+.baloo-da-2-regular {
+  font-family: "Baloo Da 2", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
